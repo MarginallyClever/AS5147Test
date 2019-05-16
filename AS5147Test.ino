@@ -21,6 +21,7 @@ void setup() {
   pinMode(PIN_MOSI,OUTPUT);
 
   digitalWrite(PIN_SELECT,HIGH);
+  digitalWrite(PIN_MOSI,HIGH);
   digitalWrite(PIN_CLOCK,LOW);
 #ifdef VERBOSE
   Serial.println("\n\n** START **\n");
@@ -65,8 +66,8 @@ boolean getSensorRawValue(uint16_t &result) {
   result=0;
   uint8_t input,parity=0;
 
-  // send the request for the angle value (command 0xFFFF)
-  digitalWrite(PIN_MOSI,HIGH);
+  // Send the request for the angle value (command 0xFFFF)
+  // at the same time as receiving an angle.
 
   // Collect the 16 bits of data from the sensor
   digitalWrite(PIN_SELECT,LOW);
@@ -83,11 +84,11 @@ boolean getSensorRawValue(uint16_t &result) {
     Serial.print(input,DEC);
 #endif
     result |= input;
-    if(i>0) parity += input;  // XOR
+    parity ^= (i>0) & input;
   }
 
   digitalWrite(PIN_SELECT,HIGH);
   
   // check the parity bit
-  return ( (parity&1) != (result>>15) );
+  return ( parity != (result>>15) );
 }
