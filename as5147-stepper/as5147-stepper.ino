@@ -57,9 +57,10 @@ void setup() {
 // @see https://ams.com/documents/20143/36005/AS5147_DS000307_2-00.pdf
  */
 boolean getSensorRawValue(uint16_t &result) {
-  result=0;
-  uint8_t input,parity=0;
+  uint8_t j, parity=0;
 
+  result=0;
+  
   // Send the request for the angle value (command 0xFFFF)
   // at the same time as receiving an angle.
 
@@ -73,12 +74,12 @@ boolean getSensorRawValue(uint16_t &result) {
     result <<= 1;
     digitalWrite(AS5147_CLK,LOW);  // clk
     
-    input = digitalRead(AS5147_MISO);  // miso
+    j = digitalRead(AS5147_MISO);  // miso
 #ifdef VERBOSE
-    Serial.print(input,DEC);
+    Serial.print(j,DEC);
 #endif
-    result |= input;
-    parity ^= (i>0) & input;
+    result |= j;
+    parity ^= (i>0) & j;
   }
 
   digitalWrite(AS5147_CSEL,HIGH);  // csel
@@ -117,6 +118,7 @@ void fullCircle(uint16_t wait,float first) {
     delayMicroseconds(wait + abs(i-MOTOR_STEPS_PER_TURN/2)/10);
   }
 }
+
 
 void loop() {
   float first=0;
